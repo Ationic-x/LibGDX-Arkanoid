@@ -4,81 +4,92 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public class Ball {
-    int x;
-    int y;
-    int size;
-    int xSpeed;
-    int ySpeed;
-    Color color = Color.WHITE;
+import java.util.Random;
+
+public class Ball extends GameObject {
+    private int xSpeed;
+    private int ySpeed;
+    private int oldXSpeed;
+    private int oldYSpeed;
 
     public Ball(int x, int y, int size, int xSpeed, int ySpeed) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
+        super(x, y, size, size);
         this.xSpeed = xSpeed;
         this.ySpeed = ySpeed;
+        this.oldXSpeed = xSpeed;
+        this.oldYSpeed = ySpeed;
+        setColor();
     }
 
     public void update() {
         x += xSpeed;
         y += ySpeed;
-        if (x < 0 || x > Gdx.graphics.getWidth()) {
-            xSpeed = -xSpeed;
-        }
+        if (x < 0)
+            xSpeed = Math.abs(xSpeed);
+        else if(x > Gdx.graphics.getWidth())
+            xSpeed = -Math.abs(xSpeed);
 
-        if (y < 0 || y > Gdx.graphics.getHeight()) {
-            ySpeed = -ySpeed;
-        }
+        if (y > Gdx.graphics.getHeight())
+            ySpeed = -Math.abs(ySpeed);
     }
 
     public void draw(ShapeRenderer shape) {
         shape.setColor(color);
-        shape.circle(x, y, size);
+        shape.circle(x, y, height);
     }
 
     public void checkCollision(Paddle paddle) {
         if (collidesWith(paddle)) {
-            if ((y - size) <= (paddle.y))
-                xSpeed = -Math.abs(xSpeed);
+            if (y - height / 1.3 <= paddle.y + ySpeed)
+                xSpeed *= -1;
             ySpeed = Math.abs(ySpeed);
         }
     }
 
     public void checkCollision(Block block) {
         if (collidesWith(block)) {
-            ySpeed = -Math.abs(ySpeed);
+            if (y + height / 1.3 >= block.y)
+                xSpeed *= -1;
+            if (y + height >= block.y + block.height)
+                ySpeed = Math.abs(ySpeed);
+            else
+                ySpeed = -Math.abs(ySpeed);
             block.destroy();
         }
     }
 
-    private boolean collidesWith(Block block) {
-        int blockMinX = block.x;
-        int blockMaxX = block.x + block.width;
-        int blockMinY = block.y;
-        int blockMaxY = block.y + block.height;
-        int ballMinX = x - size;
-        int ballMaxX = x + size;
-        int ballMinY = y - size;
-        int ballMaxY = y + size;
+    private boolean collidesWith(GameObject gameObject) {
+        int blockMinX = gameObject.x;
+        int blockMaxX = gameObject.x + gameObject.width;
+        int blockMinY = gameObject.y;
+        int blockMaxY = gameObject.y + gameObject.height;
+        int ballMinX = x - height;
+        int ballMaxX = x + height;
+        int ballMinY = y - height;
+        int ballMaxY = y + height;
         return (blockMinX < ballMaxX && blockMaxX > ballMinX) && (blockMinY < ballMaxY && blockMaxY > ballMinY);
     }
 
-    private boolean collidesWith(Paddle paddle) {
-        int paddleMinX = paddle.x;
-        int paddleMaxX = paddle.x + paddle.width;
-        int paddleMinY = paddle.y;
-        int paddleMaxY = paddle.y + paddle.height;
-        int ballMinX = x - size;
-        int ballMaxX = x + size;
-        int ballMinY = y - size;
-        int ballMaxY = y + size;
-        return (paddleMinX < ballMaxX && paddleMaxX > ballMinX) && (paddleMinY < ballMaxY && paddleMaxY > ballMinY);
+    public boolean reColor(){
+        if (((xSpeed > 0 && oldXSpeed < 0 || ySpeed > 0 && oldYSpeed < 0) || (xSpeed < 0 && oldXSpeed > 0 || ySpeed < 0 && oldYSpeed > 0))){
+            oldXSpeed = xSpeed;
+            oldYSpeed = ySpeed;
+            return true;
+        }
+        return false;
     }
 
     public boolean gameOver(Paddle paddle){
         int paddleMinY = paddle.y;
-        int ballMaxY = y + size;
+        int ballMaxY = y + height;
         return (ballMaxY < paddleMinY);
+    }
+
+    public void setColor(){
+        Random rand = new Random();
+        float r = rand.nextFloat();
+        float g = rand.nextFloat();
+        float b = rand.nextFloat();
+        color = new Color(r, g, b, 1);
     }
 }
