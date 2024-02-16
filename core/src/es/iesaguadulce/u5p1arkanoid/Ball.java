@@ -11,6 +11,7 @@ public class Ball extends GameObject {
     private int ySpeed;
     private int oldXSpeed;
     private int oldYSpeed;
+    private int life;
 
     public Ball(int x, int y, int size, int xSpeed, int ySpeed) {
         super(x, y, size, size);
@@ -18,6 +19,7 @@ public class Ball extends GameObject {
         this.ySpeed = ySpeed;
         this.oldXSpeed = xSpeed;
         this.oldYSpeed = ySpeed;
+        this.life = 3;
         setColor();
     }
 
@@ -82,14 +84,34 @@ public class Ball extends GameObject {
     public boolean gameOver(Paddle paddle){
         int paddleMinY = paddle.y;
         int ballMaxY = y + height;
-        return (ballMaxY < paddleMinY);
+        if (ballMaxY < paddleMinY){
+            life --;
+            return true;
+        }
+        return false;
     }
 
-    public void setColor(){
-        Random rand = new Random();
-        float r = rand.nextFloat();
-        float g = rand.nextFloat();
-        float b = rand.nextFloat();
-        color = new Color(r, g, b, 1);
+    public int getLife(){
+        return life;
+    }
+
+    public void setLife(int life){
+        this.life = life;
+    }
+
+    public int getxSpeed() {
+        return xSpeed;
+    }
+
+    public void setxSpeed(int xSpeed) {
+        this.xSpeed = xSpeed;
+    }
+
+    public int getySpeed() {
+        return ySpeed;
+    }
+
+    public void setySpeed(int ySpeed) {
+        this.ySpeed = ySpeed;
     }
 }

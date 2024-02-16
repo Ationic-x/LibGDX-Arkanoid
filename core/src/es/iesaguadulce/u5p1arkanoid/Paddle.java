@@ -8,9 +8,13 @@ public class Paddle extends GameObject {
     private int tempX;
     private int distance;
 
+    private boolean inverse;
+
     public Paddle(int x, int y, int width, int height, int speed) {
         super(x, y, width, height);
+        this.tempX = x;
         this.speed = speed;
+        this.inverse = false;
     }
 
     @Override
@@ -32,13 +36,28 @@ public class Paddle extends GameObject {
         }
     }
 
+    public void setTempX(int tempX){
+        this.tempX = tempX;
+    }
+
     public void newPos() {
-        tempX = Gdx.input.getX() - width / 2;
+        if(inverse)
+            tempX = Gdx.graphics.getWidth() - Gdx.input.getX() - width / 2;
+        else
+            tempX = Gdx.input.getX() - width / 2;
         if (tempX < 0) {
             tempX = 0;
         } else if (tempX + width > Gdx.graphics.getWidth()) {
             tempX = Gdx.graphics.getWidth() - width;
         }
         distance = x - tempX;
+    }
+
+    public void setInverse(boolean inverse){
+        this.inverse = inverse;
+    }
+
+    public boolean getInverse(){
+        return  inverse;
     }
 }
