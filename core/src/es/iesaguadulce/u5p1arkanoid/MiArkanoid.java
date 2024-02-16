@@ -56,12 +56,13 @@ public class MiArkanoid extends ApplicationAdapter {
 	}
 
 	private void newGame(){
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		bgm.play();
 		message = "";
         effect = "";
-        start = false;
         colorful = false;
         clean = true;
+        start = false;
 		ball = new Ball(Gdx.graphics.getWidth() / 2, 200, 50, 15, 15);
 		paddle = new Paddle(Gdx.graphics.getWidth() / 2 - 100, 100, 200, 20, 65);
 		int blockWidth = 212;
@@ -84,7 +85,7 @@ public class MiArkanoid extends ApplicationAdapter {
             if (blocks.isEmpty() || ball.gameOver(paddle)) {
                 Gdx.gl.glClearColor(0,0,0,0);
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-                if (ball.getLife() > 0) {
+                if (ball.getLife() > 0 && !blocks.isEmpty()) {
                     ball.setX(Gdx.graphics.getWidth() / 2);
                     ball.setY(200);
                     ball.setHeight(50);
@@ -93,7 +94,8 @@ public class MiArkanoid extends ApplicationAdapter {
                     paddle.setX(Gdx.graphics.getWidth() / 2 - 100);
                     paddle.setTempX(Gdx.graphics.getWidth() / 2 - 100);
                     paddle.setWidth(200);
-                    start = false;
+                    paddle.setSpeed(65);
+                    paddle.setInverse(false);
                     clean = true;
                     colorful = false;
                 } else {
@@ -127,8 +129,6 @@ public class MiArkanoid extends ApplicationAdapter {
             ballHandle(reColor);
 
             shape.end();
-        } else if(Gdx.input.isTouched()) {
-            start = true;
         } else {
             batch.begin();
             font.setColor(Color.WHITE);
@@ -136,6 +136,8 @@ public class MiArkanoid extends ApplicationAdapter {
             String initial = time == 1 ? "Touch the screen to begin" : "Touch the screen to continue";
             font.draw(batch, initial, Gdx.graphics.getWidth() / 2 - initial.getBytes().length * 12, Gdx.graphics.getHeight() / 3f);
             batch.end();
+            if (Gdx.input.isTouched())
+                start = true;
         }
 	}
 
@@ -153,9 +155,7 @@ public class MiArkanoid extends ApplicationAdapter {
 		}
 		gameOverScene.render(shape, batch, font, message);
 		if (Gdx.input.justTouched()) {
-			if (Gdx.input.isTouched()) {
-				newGame();
-			}
+			newGame();
 		}
 		shape.end();
 	}
@@ -191,7 +191,7 @@ public class MiArkanoid extends ApplicationAdapter {
 	}
 
     private void randomEffect(){
-        int value = rand.nextInt(36);
+        int value = rand.nextInt(41);
         switch (value){
             case 0:
             case 1:
@@ -280,6 +280,16 @@ public class MiArkanoid extends ApplicationAdapter {
                     effect = "Clean screen";
                 else
                     effect = "Dirty screen";
+                break;
+            case 32:
+            case 33:
+                effect = "Decrease paddle speed";
+                paddle.setSpeed((int) (paddle.getSpeed() * 0.9));
+                break;
+            case 34:
+            case 35:
+                effect = "Increase paddle speed";
+                paddle.setSpeed((int) (paddle.getSpeed() * 1.5));
                 break;
             default:
                 effect = "Nothing :)";

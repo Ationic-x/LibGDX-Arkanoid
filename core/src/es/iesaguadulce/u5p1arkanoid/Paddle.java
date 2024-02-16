@@ -60,4 +60,12 @@ public class Paddle extends GameObject {
     public boolean getInverse(){
         return  inverse;
     }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+    }
 }
